@@ -168,6 +168,9 @@ page for 5 seconds and refreshing the data every minute:
   [TfL Unified API](https://api.tfl.gov.uk/) (no API key needed).
   Shenfield/Brentwood-bound trains and the short Gidea Park/Romford
   terminators are filtered out, since they never reach Liverpool Street.
+- **`LST→HRO 08:26`** — the arrival time at Harold Wood of the next train
+  from the Liverpool Street direction (the eastbound Shenfield-bound
+  services in the same TfL feed).
 - **`LOO→LSK 09:04`** — the next Looe Valley Line train from Looe to
   Liskeard, live National Rail Darwin data via the public
   [Huxley2](https://huxley2.azurewebsites.net/) proxy. Late-running trains

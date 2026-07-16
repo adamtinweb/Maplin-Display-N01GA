@@ -40,17 +40,29 @@ def http_json(url):
     return json.load(urllib.request.urlopen(req, timeout=20))
 
 
-def next_harold_wood():
-    """'HH:MM' of the next London-bound Elizabeth line train, or None."""
+def _soonest_harold_wood(keep):
+    """'HH:MM' of the next Harold Wood arrival matching keep(dest), or None."""
     url = 'https://api.tfl.gov.uk/Line/%s/Arrivals/%s' % (TFL_LINE, TFL_STOP_ID)
     trains = [a for a in http_json(url)
-              if not any(x in (a.get('destinationName') or '')
-                         for x in TFL_EXCLUDE)]
+              if keep(a.get('destinationName') or '')]
     if not trains:
         return None
     soonest = min(trains, key=lambda a: a['timeToStation'])
     when = datetime.fromisoformat(soonest['expectedArrival']).astimezone()
     return when.strftime('%H:%M')
+
+
+def next_harold_wood():
+    """Next London-bound (westbound) Elizabeth line departure."""
+    return _soonest_harold_wood(
+        lambda dest: not any(x in dest for x in TFL_EXCLUDE))
+
+
+def next_from_london():
+    """Arrival time at Harold Wood of the next train from the Liverpool
+    Street direction — the eastbound services heading for Shenfield."""
+    return _soonest_harold_wood(
+        lambda dest: any(x in dest for x in ('Shenfield', 'Brentwood')))
 
 
 # --- Looe -> Liskeard (National Rail via Huxley2) -------------------------
@@ -80,6 +92,7 @@ def next_looe():
 # the arrow is a single character in its extended set: 'HRO→LST 08:14'.
 SERVICES = [
     ('HRO→LST', next_harold_wood),
+    ('LST→HRO', next_from_london),
     ('LOO→LSK', next_looe),
 ]
 
