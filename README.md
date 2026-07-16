@@ -93,6 +93,26 @@ The default is `q` — normal style, slow scroll, no beeps.
 `<AA>`–`<AE>` font size/style. Common symbols such as `£ € ° © ½ →` are
 translated automatically to the sign's extended character set (`<Uxx>` codes).
 
+## Ticker (`ticker.py`)
+
+A ready-made FTSE-style ticker that scrolls live market prices and news on
+the sign:
+
+```
+python ticker.py --port COM11                # run forever, refresh every 5 min
+python ticker.py --port COM11 --interval 60  # refresh every minute
+python ticker.py --port COM11 --once         # single update
+python ticker.py --dry-run --once            # preview the text, no sign needed
+```
+
+Out of the box it shows Expedia (EXPE), Bitcoin in GBP, and three LSE ETFs —
+iShares Core FTSE 100 (ISF), Vanguard S&P 500 Acc (VUAG) and Xtrackers
+Nasdaq 100 (XNAQ) — each with an up/down arrow and percent change against the
+previous close, followed by the current top BBC News headline. Quotes come
+from Yahoo Finance's public chart API (no API key required) and the headline
+from the BBC News RSS feed. Edit the `QUOTES` list at the top of the script
+to change the instruments.
+
 ## Protocol notes
 
 Every command is an ASCII packet:
