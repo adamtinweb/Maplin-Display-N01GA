@@ -113,6 +113,24 @@ from Yahoo Finance's public chart API (no API key required) and the headline
 from the BBC News RSS feed. Edit the `QUOTES` list at the top of the script
 to change the instruments.
 
+## Effects demo (`demo.py`)
+
+A guided tour of every display effect, each paired with a fitting famous
+quote — "Carpe diem" appears instantly, Roosevelt's "fear itself" speech
+scrolls by ticker-style, "Stay hungry" holds on screen, "Let it snow" falls
+in as snow, Einstein's "Play dice?" arrives as random pixels, and so on
+through all 18 leading effects, a variety of lagging effects and hold times,
+ending with the sign's three built-in pen-writing animations:
+
+```
+python demo.py --port COM11           # play the tour once (about 4 minutes)
+python demo.py --port COM11 --loop    # repeat forever
+python demo.py --port COM11 --fast    # quicker scroll speed, shorter pauses
+```
+
+Static effects use short quotes (the display fits ~13 characters without
+scrolling); the four scrolling effects carry full-length quotes.
+
 ## Protocol notes
 
 Every command is an ASCII packet:
