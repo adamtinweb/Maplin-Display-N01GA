@@ -149,6 +149,34 @@ python demo.py --port COM11 --fast    # quicker scroll speed, shorter pauses
 Static effects use short quotes (the display fits ~13 characters without
 scrolling); the four scrolling effects carry full-length quotes.
 
+## Train departure board (`trains.py`)
+
+A live next-train board that vertical-scrolls between routes, holding each
+page for 5 seconds and refreshing the data every minute:
+
+- **`HRO→LST 08:14`** — the next Elizabeth line train from Harold Wood
+  towards London Liverpool Street, from the
+  [TfL Unified API](https://api.tfl.gov.uk/) (no API key needed).
+  Shenfield/Brentwood-bound trains and the short Gidea Park/Romford
+  terminators are filtered out, since they never reach Liverpool Street.
+- **`LOO→LSK 09:04`** — the next Looe Valley Line train from Looe to
+  Liskeard, live National Rail Darwin data via the public
+  [Huxley2](https://huxley2.azurewebsites.net/) proxy. Late-running trains
+  show their revised time, or `DLYD`/`CANX` when Darwin reports them
+  delayed or cancelled; `NONE` means no trains (the branch sleeps
+  overnight).
+
+```
+python trains.py --port COM11               # run forever, refresh every minute
+python trains.py --port COM11 --once        # single update
+python trains.py --dry-run --once           # preview the pages, no sign needed
+```
+
+Routes use National Rail CRS codes with the sign's arrow glyph, sized to
+the display's ~13 character width. To add or change routes, edit the
+`SERVICES` list — each entry is a route label plus a function returning the
+next departure time; the sign cycles up to six pages.
+
 ## Protocol notes
 
 Every command is an ASCII packet:
