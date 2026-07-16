@@ -51,6 +51,67 @@ WAIT_TIMES = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 #             3rd-5th = songs 1-3 (the sign beeps tunes while holding)
 DISPLAY_METHODS = 'ABCDEQRSTUabcdeqrstu'
 
+# 5x7 pixel font (rows top to bottom, 5 bits per row, MSB = left pixel)
+# used to build the 180-degree rotated character set for upside-down
+# mounting. The AM03127 <Fsxy> command can redefine the European char
+# table slots <U40>..<U7F> with custom glyphs.
+FONT_5X7 = {
+    '0': (0b01110, 0b10001, 0b10011, 0b10101, 0b11001, 0b10001, 0b01110),
+    '1': (0b00100, 0b01100, 0b00100, 0b00100, 0b00100, 0b00100, 0b01110),
+    '2': (0b01110, 0b10001, 0b00001, 0b00010, 0b00100, 0b01000, 0b11111),
+    '3': (0b11111, 0b00010, 0b00100, 0b00010, 0b00001, 0b10001, 0b01110),
+    '4': (0b00010, 0b00110, 0b01010, 0b10010, 0b11111, 0b00010, 0b00010),
+    '5': (0b11111, 0b10000, 0b11110, 0b00001, 0b00001, 0b10001, 0b01110),
+    '6': (0b00110, 0b01000, 0b10000, 0b11110, 0b10001, 0b10001, 0b01110),
+    '7': (0b11111, 0b00001, 0b00010, 0b00100, 0b01000, 0b01000, 0b01000),
+    '8': (0b01110, 0b10001, 0b10001, 0b01110, 0b10001, 0b10001, 0b01110),
+    '9': (0b01110, 0b10001, 0b10001, 0b01111, 0b00001, 0b00010, 0b01100),
+    'A': (0b01110, 0b10001, 0b10001, 0b11111, 0b10001, 0b10001, 0b10001),
+    'B': (0b11110, 0b10001, 0b10001, 0b11110, 0b10001, 0b10001, 0b11110),
+    'C': (0b01110, 0b10001, 0b10000, 0b10000, 0b10000, 0b10001, 0b01110),
+    'D': (0b11110, 0b10001, 0b10001, 0b10001, 0b10001, 0b10001, 0b11110),
+    'E': (0b11111, 0b10000, 0b10000, 0b11110, 0b10000, 0b10000, 0b11111),
+    'F': (0b11111, 0b10000, 0b10000, 0b11110, 0b10000, 0b10000, 0b10000),
+    'G': (0b01110, 0b10001, 0b10000, 0b10111, 0b10001, 0b10001, 0b01111),
+    'H': (0b10001, 0b10001, 0b10001, 0b11111, 0b10001, 0b10001, 0b10001),
+    'I': (0b01110, 0b00100, 0b00100, 0b00100, 0b00100, 0b00100, 0b01110),
+    'J': (0b00111, 0b00010, 0b00010, 0b00010, 0b00010, 0b10010, 0b01100),
+    'K': (0b10001, 0b10010, 0b10100, 0b11000, 0b10100, 0b10010, 0b10001),
+    'L': (0b10000, 0b10000, 0b10000, 0b10000, 0b10000, 0b10000, 0b11111),
+    'M': (0b10001, 0b11011, 0b10101, 0b10101, 0b10001, 0b10001, 0b10001),
+    'N': (0b10001, 0b11001, 0b10101, 0b10011, 0b10001, 0b10001, 0b10001),
+    'O': (0b01110, 0b10001, 0b10001, 0b10001, 0b10001, 0b10001, 0b01110),
+    'P': (0b11110, 0b10001, 0b10001, 0b11110, 0b10000, 0b10000, 0b10000),
+    'Q': (0b01110, 0b10001, 0b10001, 0b10001, 0b10101, 0b10010, 0b01101),
+    'R': (0b11110, 0b10001, 0b10001, 0b11110, 0b10100, 0b10010, 0b10001),
+    'S': (0b01111, 0b10000, 0b10000, 0b01110, 0b00001, 0b00001, 0b11110),
+    'T': (0b11111, 0b00100, 0b00100, 0b00100, 0b00100, 0b00100, 0b00100),
+    'U': (0b10001, 0b10001, 0b10001, 0b10001, 0b10001, 0b10001, 0b01110),
+    'V': (0b10001, 0b10001, 0b10001, 0b10001, 0b10001, 0b01010, 0b00100),
+    'W': (0b10001, 0b10001, 0b10001, 0b10101, 0b10101, 0b10101, 0b01010),
+    'X': (0b10001, 0b10001, 0b01010, 0b00100, 0b01010, 0b10001, 0b10001),
+    'Y': (0b10001, 0b10001, 0b01010, 0b00100, 0b00100, 0b00100, 0b00100),
+    'Z': (0b11111, 0b00001, 0b00010, 0b00100, 0b01000, 0b10000, 0b11111),
+    ':': (0b00000, 0b01100, 0b01100, 0b00000, 0b01100, 0b01100, 0b00000),
+    '-': (0b00000, 0b00000, 0b00000, 0b11111, 0b00000, 0b00000, 0b00000),
+    '.': (0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b01100, 0b01100),
+    ',': (0b00000, 0b00000, 0b00000, 0b00000, 0b01100, 0b00100, 0b01000),
+    '!': (0b00100, 0b00100, 0b00100, 0b00100, 0b00100, 0b00000, 0b00100),
+    '?': (0b01110, 0b10001, 0b00001, 0b00010, 0b00100, 0b00000, 0b00100),
+    '/': (0b00000, 0b00001, 0b00010, 0b00100, 0b01000, 0b10000, 0b00000),
+    "'": (0b01100, 0b00100, 0b01000, 0b00000, 0b00000, 0b00000, 0b00000),
+}
+
+
+def _rotate_glyph(rows):
+    """Rotate a 5x7 glyph 180 degrees: reverse row order, mirror each row."""
+    return tuple(int(format(r, '05b')[::-1], 2) for r in reversed(rows))
+
+
+# Effects that look wrong when the sign hangs upside down, and what to use
+# instead so the apparent motion stays the same.
+FLIP_EFFECTS = {'C': 'D', 'D': 'C', 'E': 'F', 'F': 'E', 'I': 'J', 'J': 'I'}
+
 # The sign's extended character set (sent as <Uxx> codes). Only the
 # common ones are mapped here; see the AM03127 manual for the full table.
 CHAR_MAP = {
@@ -84,7 +145,7 @@ class LedSign:
             cs ^= ord(c)
         return format(cs, '02X')
 
-    def send(self, payload):
+    def send(self, payload, _retried=False):
         """Wrap payload in <IDxx>...checksum<E>, send it, return True on ACK."""
         packet = '<ID%02X>%s%s<E>' % (self.sign_id, payload, self.checksum(payload))
         self.ser.reset_input_buffer()
@@ -93,7 +154,48 @@ class LedSign:
         if self.sign_id == 0:
             return True
         reply = self.ser.read(3).decode('ascii', errors='replace')
-        return reply == 'ACK'
+        if reply == 'ACK':
+            return True
+        if not _retried:
+            # the sign forgets its ID when it loses power and then ignores
+            # everything addressed to it -- re-teach the ID and retry once
+            self.set_id(self.sign_id)
+            return self.send(payload, _retried=True)
+        return False
+
+    def install_flipped_font(self):
+        """Upload 180-degree rotated glyphs into the sign's redefinable
+        European character slots <U40>+. Call once before flip_text()."""
+        self.flip_slots = {}
+        all_ok = True
+        for i, ch in enumerate(sorted(FONT_5X7)):
+            rows = _rotate_glyph(FONT_5X7[ch])
+            # <FAxy>: redefine 5x7 char at slot xy; 8 data bytes, each row
+            # left-aligned (5-bit row in bits 7..3), padded to 8 with 0x00
+            data = ''.join(chr(r << 3) for r in rows) + '\x00'
+            packet = '<FA%02X>' % i + data
+            if not self.send(packet):
+                # the sign sometimes needs a breather between flash writes
+                time.sleep(0.3)
+                all_ok &= self.send(packet)
+            self.flip_slots[ch] = 0x40 + i
+            time.sleep(0.1)
+        return all_ok
+
+    def flip_text(self, text):
+        """Convert text for a sign hung upside down: reverse the string and
+        map characters to the rotated glyphs from install_flipped_font()."""
+        out = []
+        for ch in reversed(text.upper()):
+            if ch in self.flip_slots:
+                out.append('<U%02X>' % self.flip_slots[ch])
+            elif ch == '→':
+                out.append('←')   # the factory arrows are each other rotated
+            elif ch == '←':
+                out.append('→')
+            else:
+                out.append(ch)    # space and unknown chars pass through
+        return ''.join(out)
 
     def set_page(self, text, page='A', lead='E', method='q', wait='C', lag='E'):
         """Store a message on a page. Page 'A' plays by default."""

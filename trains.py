@@ -96,12 +96,20 @@ def build_pages():
     return pages
 
 
-def update_sign(sign, pages):
+def update_sign(sign, pages, invert=False, flip=False):
     """Write the pages and have the sign vertical-scroll between them."""
+    # scroll up reads as scroll down on an upside-down sign, so swap it
+    effect = 'J' if flip else 'I'
     ok = True
     for page_id, text in zip('ABCDEF', pages):
-        ok &= sign.set_page(text, page=page_id, lead='I', method='q',
-                            wait=PAGE_WAIT, lag='I')
+        if flip:
+            text = sign.flip_text(text)
+        if invert:
+            # <CL> = "Inversed Red" colour code from the AM03127 manual:
+            # dark text on a lit background
+            text = '<CL>' + text
+        ok &= sign.set_page(text, page=page_id, lead=effect, method='q',
+                            wait=PAGE_WAIT, lag=effect)
     ok &= sign.run_pages('ABCDEF'[:len(pages)])
     return ok
 
@@ -115,6 +123,11 @@ def main():
     ap.add_argument('--id', type=int, default=1, help='sign ID (default 1)')
     ap.add_argument('--interval', type=int, default=60,
                     help='seconds between data refreshes (default 60)')
+    ap.add_argument('--invert', action='store_true',
+                    help='inverse video: dark text on a lit background')
+    ap.add_argument('--flip', action='store_true',
+                    help='rotate the display 180 degrees for upside-down '
+                         'mounting (uploads a rotated font to the sign)')
     ap.add_argument('--once', action='store_true', help='update once and exit')
     ap.add_argument('--dry-run', action='store_true',
                     help='print the pages instead of sending them')
@@ -133,7 +146,10 @@ def main():
             else:
                 if sign is None:
                     sign = LedSign(args.port, sign_id=args.id)
-                ok = update_sign(sign, pages)
+                    if args.flip and not sign.install_flipped_font():
+                        print('warning: rotated font upload not ACKed')
+                ok = update_sign(sign, pages, invert=args.invert,
+                                 flip=args.flip)
                 print('[%s] %s -- %s' % (stamp, 'sent OK' if ok else 'NO ACK',
                                          ' / '.join(pages)))
             if args.once:

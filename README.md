@@ -44,6 +44,12 @@ python led_sign.py --port COM11 --delete-all
 If a command reports `no ACK`, the usual causes are the wrong COM port, a
 sign whose ID is not 1 (fix with `--set-id 1`), or swapped TX/RX wiring.
 
+**Power-loss quirk:** the sign forgets its ID whenever it loses power, and
+then silently ignores every command except the broadcast ID assignment.
+`LedSign.send()` self-heals: on a missing ACK it re-broadcasts the ID and
+retries once, so all the scripts here recover automatically after a power
+cycle — no manual `--set-id` needed.
+
 It can also be used as a library:
 
 ```python
@@ -76,18 +82,21 @@ sign.close()
 `N` block move, `P` random, `Q`/`R`/`S` pen-writing demos.
 Lagging effects are the same set limited to `A`–`K`.
 
-**Display method** (`--method`) — decoded by experiment on real N01GA
-hardware, since no manual documents it fully. The four letter groups select
-the scroll speed and the position within the group selects the style:
+**Display method** (`--method`) — first decoded by experiment on the N01GA,
+later confirmed exactly by the official AM004-03127 manual. The four letter
+groups select the effect speed and the position within the group selects the
+style:
 
 | Group | Speed |
 |---|---|
-| `A`–`E`, `Q`–`U` (uppercase) | fast |
-| `a`–`e`, `q`–`u` (lowercase) | slow |
+| `A`–`E` | level 1, fastest |
+| `Q`–`U` | level 2, middle fast |
+| `a`–`e` | level 3, middle slow |
+| `q`–`u` | level 4, slowest |
 
 Within each group: 1st letter (`A`/`Q`/`a`/`q`) = normal, 2nd = blinking,
 3rd–5th = built-in songs 1–3 (the sign beeps a tune while the text holds).
-The default is `q` — normal style, slow scroll, no beeps.
+The default is `q` — normal style, slowest speed, no beeps.
 
 **Inline codes** usable inside a message: `<KT>` live time, `<KD>` live date,
 `<AA>`–`<AE>` font size/style. Common symbols such as `£ € ° © ½ →` are
@@ -170,12 +179,25 @@ page for 5 seconds and refreshing the data every minute:
 python trains.py --port COM11               # run forever, refresh every minute
 python trains.py --port COM11 --once        # single update
 python trains.py --dry-run --once           # preview the pages, no sign needed
+python trains.py --port COM11 --invert      # dark text on a lit background
+python trains.py --port COM11 --flip        # rotated 180° for upside-down mounting
 ```
 
 Routes use National Rail CRS codes with the sign's arrow glyph, sized to
 the display's ~13 character width. To add or change routes, edit the
 `SERVICES` list — each entry is a route label plus a function returning the
 next departure time; the sign cycles up to six pages.
+
+`--invert` uses the AM03127 `<CL>` "Inversed Red" colour code. `--flip` is
+for hanging the sign upside down: the protocol has no rotate command, so at
+startup the script uploads a 180°-rotated 5×7 font (A–Z, 0–9, punctuation)
+into the sign's 64 redefinable character slots via the `<Fsxy>` command
+(takes ~10 s), then sends each message reversed and mapped to those glyphs,
+and swaps the scroll direction so the motion reads correctly. The two
+switches can be combined. The font machinery lives in `led_sign.py`
+(`install_flipped_font()` / `flip_text()`) for use by other scripts; note
+live inline codes like `<KT>` cannot be flipped, as the sign renders them
+itself.
 
 ## Protocol notes
 
@@ -202,7 +224,14 @@ sign answers `ACK` on success. A text page payload looks like:
 
 Other commands used by the app: `<SC>` set clock, `<Bx>` brightness,
 `<RPx>` set the default run page, `<Tx>…` schedules, `<D*>` delete all,
-`<ID><nn><E>` assign sign ID (sent raw, without a checksum).
+`<ID><nn><E>` assign sign ID (sent raw, without a checksum; this is the
+only command an ID-less sign responds to — see the power-loss quirk above).
+
+Inside a message the protocol also supports `<Cx>` colour codes (on the
+red-only N01GA, `<CL>` "Inversed Red" gives inverse video), `<Bx>` bell
+beeps of configurable duration, `<Nxx>` column positioning, and `<Fsxy>` +
+8 bytes to redefine the glyphs of European character slots `<U40>`–`<U7F>`
+(`<DU>` restores the factory table) — the trick behind `--flip`.
 
 ## Sources
 
@@ -217,8 +246,13 @@ The protocol details were pieced together from these excellent resources:
   listing of the effect, wait, bell, colour and font tags
 - [N00GA technical manual](https://www.yumpu.com/en/document/view/18868597/n00ga-technical-manualpdf-filesize)
   — the original Maplin/Amplus protocol document
-- The `--method` speed/style letter map was worked out empirically on the
-  actual N01GA, as it is not fully documented anywhere above.
+- [AM004-03128/03127 LED Display Board Communication v2.2 (PDF)](https://asset.conrad.com/media10/add/160267/c1/-/en/000590998DS01/datasheet-590998-mc-crypt-am03127-h11.pdf)
+  — the official Amplus protocol datasheet: authoritative source for the
+  display-method speed table, colour codes, column positioning and the
+  `<Fsxy>` font-redefinition command used by `--flip`
+- The `--method` letter map was first worked out empirically on the actual
+  N01GA, then confirmed against the datasheet above. The power-loss ID
+  quirk is empirical.
 
 ## License
 
