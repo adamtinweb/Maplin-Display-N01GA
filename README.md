@@ -116,11 +116,29 @@ to change the instruments.
 ## Effects demo (`demo.py`)
 
 A guided tour of every display effect, each paired with a fitting famous
-quote — "Carpe diem" appears instantly, Roosevelt's "fear itself" speech
-scrolls by ticker-style, "Stay hungry" holds on screen, "Let it snow" falls
-in as snow, Einstein's "Play dice?" arrives as random pixels, and so on
-through all 18 leading effects, a variety of lagging effects and hold times,
-ending with the sign's three built-in pen-writing animations:
+quote, plus a variety of lagging effects and hold times along the way. The
+full running order:
+
+| # | Effect | Shown with |
+|---|---|---|
+| 1 | `A` appear instantly | "Carpe diem" — Horace |
+| 2 | `B` X-open from centre | "To be, or not to be" — Shakespeare |
+| 3 | `C` curtain up | "All the world's a stage" — Shakespeare |
+| 4 | `D` curtain down | "Good night, sweet prince" — Shakespeare |
+| 5 | `E` scroll left (classic ticker) | "The only thing we have to fear is fear itself" — Roosevelt |
+| 6 | `F` scroll right | "Float like a butterfly, sting like a bee" — Muhammad Ali |
+| 7 | `G` V-open | "Eureka!" — Archimedes |
+| 8 | `H` V-close | "I'll be back" — The Terminator |
+| 9 | `I` scroll up | "One small step for man, one giant leap for mankind" — Armstrong |
+| 10 | `J` scroll down | "What goes up must come down" — Newton |
+| 11 | `K` hold (10 s) | "Stay hungry, stay foolish" — Steve Jobs |
+| 12 | `L` snow | "Let it snow" — Sammy Cahn |
+| 13 | `M` twinkle | "Twinkle, twinkle, little star" — Jane Taylor |
+| 14 | `N` block move | "Rome wasn't built in a day" |
+| 15 | `P` random pixels | "God does not play dice" — Einstein |
+| 16 | `Q` pen-writing demo | the sign hand-writes "hello world" |
+| 17 | `R` pen-writing demo | the sign hand-writes "welcome" |
+| 18 | `S` pen-writing demo | the sign hand-writes "Amplus" |
 
 ```
 python demo.py --port COM11           # play the tour once (about 4 minutes)
